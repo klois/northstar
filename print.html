@@ -165,7 +165,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#implementing-a-client" id="implementing-a-client">Implementing a client</a></h1>
+                        <h1 id="implementing-a-client"><a class="header" href="#implementing-a-client">Implementing a client</a></h1>
 <p>This tutorial demonstrates how to interact with <strong>Northstar</strong> using its <strong>API</strong>.</p>
 <p><strong>Northstar</strong> uses <strong>JSON</strong> to encode the messages shared with clients. This is
 a common approach that facilitates clients being implemented in any programming
@@ -174,7 +174,7 @@ type that can be used for a simpler client implementation using <strong>Rust</st
 <p>For general purposes, the snippets shown in this tutorial are
 written in <strong>Python</strong> for its simplicity and easy translation to other
 languages.</p>
-<h1><a class="header" href="#interation-with-northstar" id="interation-with-northstar">Interation with Northstar</a></h1>
+<h1 id="interation-with-northstar"><a class="header" href="#interation-with-northstar">Interation with Northstar</a></h1>
 <p>Northstar interacts with clients through a <code>TCP</code> socket. The clients exchange
 messages with Northstar in the form of requests and responses encoded in
 <strong>JSON</strong>. These requests and responses are a direct serialization of the
@@ -199,7 +199,7 @@ tag a message exchange.</p>
 </code></pre>
 <p>The <code>MESSAGE_TYPE</code> can be either <code>&quot;Request&quot;</code>, <code>&quot;Response&quot;</code>, or <code>&quot;Notification&quot;</code>.
 Northstar should only send responses and notifications to clients.</p>
-<h1><a class="header" href="#northstar-repositories" id="northstar-repositories">Northstar Repositories</a></h1>
+<h1 id="northstar-repositories"><a class="header" href="#northstar-repositories">Northstar Repositories</a></h1>
 <p>Repositories are used to group sets of containers. These are specified in
 the Northstar configuration (see <code>northstar.toml</code>).</p>
 <p>Containers can be added or removed from repositories at runtime by
@@ -255,14 +255,14 @@ response = json.loads(response.decode('utf-8'))
 # e.g. {'Response': {'Repositories': {'default': {'dir': 'target/northstar/repository'}}}}
 print(response['payload'])
 </code></pre>
-<h1><a class="header" href="#containers" id="containers">Containers</a></h1>
+<h1 id="containers"><a class="header" href="#containers">Containers</a></h1>
 <ul>
 <li><a href="client/list_containers.html">List containers</a></li>
 <li><a href="client/start_containers.html">Starting containers and notifications</a></li>
 <li><a href="client/stop_containers.html">Stopping containers</a></li>
 <li><a href="client/install_containers.html">Installing and uninstalling containers</a></li>
 </ul>
-<h1><a class="header" href="#listing-containers" id="listing-containers">Listing containers</a></h1>
+<h1 id="listing-containers"><a class="header" href="#listing-containers">Listing containers</a></h1>
 <p>In the same way as <a href="client/repositories.html">repositories</a>, it is possible to request
 the current state of the Northstar containers. Here is the <code>JSON</code> structure that
 encodes the request for the state of the containers:</p>
@@ -315,7 +315,7 @@ for container in response['payload']['Response']['Containers']:
 # e.g. containers: ['cpueater', 'ferris_says_hello', 'seccomp', 'memeater', ...
 print(f'containers: {names}')
 </code></pre>
-<h1><a class="header" href="#starting-containers-and-notifications" id="starting-containers-and-notifications">Starting containers and notifications</a></h1>
+<h1 id="starting-containers-and-notifications"><a class="header" href="#starting-containers-and-notifications">Starting containers and notifications</a></h1>
 <p>Northstar has a notification system where messages are sent to the clients with
 information about events such as:</p>
 <ul>
@@ -372,7 +372,7 @@ print(json.loads(response.decode('utf-8')))
 response = s.recv(8000)
 print(json.loads(response.decode('utf-8')))
 </code></pre>
-<h1><a class="header" href="#stopping-containers" id="stopping-containers">Stopping containers</a></h1>
+<h1 id="stopping-containers"><a class="header" href="#stopping-containers">Stopping containers</a></h1>
 <p>Analogous to <a href="client/start_containers.html">starting containers</a>, this is the <code>JSON</code>
 structure to stop a container:</p>
 <pre><code class="language-json">{
@@ -434,7 +434,7 @@ print(json.loads(response.decode('utf-8')))
 response = s.recv(8000)
 print(json.loads(response.decode('utf-8')))
 </code></pre>
-<h1><a class="header" href="#installing-and-uninstalling-containers" id="installing-and-uninstalling-containers">Installing and uninstalling containers</a></h1>
+<h1 id="installing-and-uninstalling-containers"><a class="header" href="#installing-and-uninstalling-containers">Installing and uninstalling containers</a></h1>
 <p>Installing containers is a bit trickier. First a request to install a new
 container is sent with the target repository and the size of the container <code>npk</code>
 file in bytes. Then the file is directly copied into the socket. If successful,

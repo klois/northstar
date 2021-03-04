@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="client/client.html"><strong aria-hidden="true">1.</strong> Implementing a client</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="client/connect.html"><strong aria-hidden="true">1.1.</strong> Interacting with Northstar</a></li><li class="chapter-item expanded "><a href="client/repositories.html"><strong aria-hidden="true">1.2.</strong> Repositories</a></li><li class="chapter-item expanded "><a href="client/containers.html"><strong aria-hidden="true">1.3.</strong> Containers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="client/list_containers.html"><strong aria-hidden="true">1.3.1.</strong> List containers</a></li><li class="chapter-item expanded "><a href="client/start_containers.html"><strong aria-hidden="true">1.3.2.</strong> Starting containers and notifications</a></li><li class="chapter-item expanded "><a href="client/stop_containers.html"><strong aria-hidden="true">1.3.3.</strong> Stopping containers</a></li><li class="chapter-item expanded "><a href="client/install_containers.html"><strong aria-hidden="true">1.3.4.</strong> Installing and uninstalling containers</a></li></ol></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="client/client.html"><strong aria-hidden="true">1.</strong> Implementing a client</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="client/connect.html"><strong aria-hidden="true">1.1.</strong> Interacting with Northstar</a></li><li class="chapter-item expanded "><a href="client/repositories.html"><strong aria-hidden="true">1.2.</strong> Repositories</a></li><li class="chapter-item expanded "><a href="client/containers.html"><strong aria-hidden="true">1.3.</strong> Containers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="client/list_containers.html"><strong aria-hidden="true">1.3.1.</strong> List containers</a></li><li class="chapter-item expanded "><a href="client/start_containers.html"><strong aria-hidden="true">1.3.2.</strong> Starting containers and notifications</a></li><li class="chapter-item expanded "><a href="client/stop_containers.html"><strong aria-hidden="true">1.3.3.</strong> Stopping containers</a></li><li class="chapter-item expanded "><a href="client/install_containers.html"><strong aria-hidden="true">1.3.4.</strong> Installing and uninstalling containers</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="sextant/npk.html"><strong aria-hidden="true">2.</strong> Working with NPK files</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sextant/pack.html"><strong aria-hidden="true">2.1.</strong> Packing an NPK</a></li><li class="chapter-item expanded "><a href="sextant/unpack.html"><strong aria-hidden="true">2.2.</strong> Unpacking an NPK</a></li><li class="chapter-item expanded "><a href="sextant/inspect.html"><strong aria-hidden="true">2.3.</strong> Inspecting an NPK</a></li><li class="chapter-item expanded "><a href="sextant/gen_repo_keys.html"><strong aria-hidden="true">2.4.</strong> Generating Repository Keys</a></li><li class="chapter-item expanded "><a href="sextant/npk_format_reference.html"><strong aria-hidden="true">2.5.</strong> NPK Format Reference</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -549,6 +549,368 @@ print(json.loads(response.decode('utf-8')))
 # {'Notification': {'Uninstalled': ['foo', '0.0.1']}}}
 response = s.recv(8000)
 print(json.loads(response.decode('utf-8')))
+</code></pre>
+<h1 id="working-with-npk-files"><a class="header" href="#working-with-npk-files">Working with NPK files</a></h1>
+<p>Northstar containers are distributed in the NPK file format.</p>
+<p>NPKs contain both the container's application logic as well as the data files necessary to mount an run the container.
+To facilitate the creation, inspection and modification of NPKs, northstar provides the <code>sextant</code> CLI tool.</p>
+<p>The following chapters describe how to use <code>sextant</code> to work with NPKs and explain the internal structure of the NPK file format.</p>
+<ul>
+<li><a href="sextant/pack.html">Packing an NPK</a></li>
+<li><a href="sextant/unpack.html">Unpacking an NPK</a></li>
+<li><a href="sextant/inspect.html">Inspecting an NPK</a></li>
+<li><a href="sextant/gen_repo_keys.html">Generating Repository Keys</a></li>
+<li><a href="sextant/npk_format_reference.html">NPK Format Reference</a></li>
+</ul>
+<h1 id="packing-an-npk"><a class="header" href="#packing-an-npk">Packing an NPK</a></h1>
+<p>NPKs are created using the <code>pack</code> command of <code>sextant</code>.
+The command requires the following input:</p>
+<ol>
+<li>a manifest file describing the NPK</li>
+<li>a root folder containing all files required at runtime</li>
+</ol>
+<h2 id="the-manifest-file"><a class="header" href="#the-manifest-file">The Manifest File</a></h2>
+<p>The manifest is a YAML file that references all necessary data to mount and execute the container.
+An example <code>manifest.yaml</code> of the <code>hello</code> container (found in <code>examples/container/hello/manifest.yaml</code>) looks as follows:</p>
+<pre><code class="language-yaml">name: hello
+version: 0.0.1
+init: /hello
+uid: 1000
+gid: 1000
+env:
+  HELLO: northstar
+io:
+  stdout:
+    log:
+      - DEBUG
+      - hello
+mounts:
+    /lib:
+      host: /lib
+    /lib64:
+      host: /lib64
+    /system:
+      host: /system
+</code></pre>
+<p>More details on the manifest format can be found in the chapter
+<a href="sextant/npk_format_reference.html">NPK Format Reference</a>.</p>
+<h2 id="the-root-folder"><a class="header" href="#the-root-folder">The <code>root</code> Folder</a></h2>
+<p>The root folder contains all the container data that will be available during runtime.
+This includes executable files as well as additional resources.
+During packing, the contents of the folder will be copied to a squashfs image that is then added to the NPK.
+This image file will be mounted by the northstar runtime when the container is run.</p>
+<h2 id="calling-sextant-pack"><a class="header" href="#calling-sextant-pack">Calling <code>sextant pack</code></a></h2>
+<p>Let us <code>pack</code> the <code>hello</code> example container under Linux.
+First, we build the <code>hello</code> binary from the northstar directory using cargo:</p>
+<pre><code class="language-bash">$ cargo build --release --bin hello
+Compiling hello v0.1.0 (/home/nori/dev/northstar/examples/container/hello)
+Finished release [optimized] target(s) in 2.77s
+</code></pre>
+<p>The resulting binary is found in the <code>target/release</code> directory:</p>
+<pre><code class="language-bash">$ ls target/release/hello
+target/release/hello
+</code></pre>
+<p>Next, we can crate the destination directory if it does not already exist.
+We will choose <code>target/northstar/repository</code> as our destination as it is the default place where northstar looks for NPKs on startup.
+This default is configured in <code>northstar.toml</code>.</p>
+<pre><code class="language-bash">$ mkdir -p target/northstar/repository
+</code></pre>
+<p>Finally, we are able to call <code>sextant</code> and create the NPK:</p>
+<pre><code class="language-bash">$ target/debug/sextant pack \
+--manifest examples/container/hello/manifest.yaml \
+--root target/release/hello \
+--out target/northstar/repository
+</code></pre>
+<p>The resulting file can be found in the output directory:</p>
+<pre><code class="language-bash">$ ls target/northstar/repository
+hello-0.0.1.npk
+</code></pre>
+<h2 id="signing-an-npk"><a class="header" href="#signing-an-npk">Signing an NPK</a></h2>
+<p>NPKs can be signed using ed25519 signatures.
+If your runtime is configured to check NPK signatures then containers with missing or invalid signatures will not be accepted.
+To create a signed version of our container we have to specify the required private key:</p>
+<pre><code class="language-bash">$ target/debug/sextant pack \
+--manifest examples/container/hello/manifest.yaml \
+--root target/release/hello \
+--key ./examples/keys/northstar.key \
+--out target/northstar/repository
+</code></pre>
+<p>Chapter <a href="sextant/gen_repo_keys.html">Generating Repository Keys</a> describes how to generate keys suitable for signing and verifying NPKs.</p>
+<h1 id="unpacking-an-npk"><a class="header" href="#unpacking-an-npk">Unpacking an NPK</a></h1>
+<p>NPKs are ZIP files that contain among other things a squashfs image that will be mounted at runtime.
+To extract both the outer ZIP and the inner image, the <code>unpack</code> command of <code>sextant</code> can be used.</p>
+<p>To unpack the <code>hello</code> container we packed in the chapter <a href="sextant/pack.html">Packing an NPK</a> we first create an output directory for the extracted contents:</p>
+<pre><code class="language-bash">$ mkdir hello_container
+</code></pre>
+<p>Next, we call <code>sextant unpack</code>:</p>
+<pre><code class="language-bash">$ target/debug/sextant unpack \
+--npk ./target/northstar/repository/hello-0.0.1.npk \
+--out ./hello_container
+</code></pre>
+<p>The extracted container can be found in the directroy we created:</p>
+<pre><code class="language-bash">$ ls hello_container
+fs.img  manifest.yaml  signature.yaml  squashfs-root
+</code></pre>
+<p>As we can see, a <code>squashfs-root</code> directory was created.
+It contains the extracted contents of the <code>fs.img</code> squashfs image:</p>
+<pre><code class="language-bash">$ ls hello_container/squashfs-root/
+dev  hello  lib  lib64  proc  system
+</code></pre>
+<p>We can see the <code>hello</code> binary as well as the empty mount points mentioned in the <code>manifest.yaml</code>.</p>
+<h1 id="inspecting-an-npk"><a class="header" href="#inspecting-an-npk">Inspecting an NPK</a></h1>
+<p>To get information about an already packed NPK <code>sextant</code> provides the <code>inspect</code> command.</p>
+<h2 id="inspecting-an-npk-with-default-settings"><a class="header" href="#inspecting-an-npk-with-default-settings">Inspecting an NPK with Default Settings</a></h2>
+<p>Inspecting an NPK without any additional parameters will show the following information:</p>
+<ul>
+<li>Listing of files contained in the NPK</li>
+<li>Contents of manifest.yaml</li>
+<li>Contents of signature.yaml</li>
+<li>Listing of files contained in the compressed squashfs image (<code>fs.img</code>) within the NPK</li>
+</ul>
+<p>For example, inspecting the <code>hello</code> example container gives the following output:</p>
+<pre><code class="language-markdown">$ sextant inspect target/northstar/repository/hello-0.0.1.npk 
+# inspection of 'target/northstar/repository/hello-0.0.1.npk'
+## NPK Content
+signature.yaml
+manifest.yaml
+fs.img
+
+## manifest.yaml
+name: hello
+version: 0.0.1
+init: /hello
+uid: 1000
+gid: 1000
+env:
+  HELLO: northstar
+io:
+  stdout:
+    log:
+      - DEBUG
+      - hello
+mounts:
+    /lib:
+      host: /lib
+    /lib64:
+      host: /lib64
+    /system:
+      host: /system
+
+
+## signature.yaml
+manifest.yaml:
+  hash: ee5967e740febb3a1e018e189ed21412f8bf71d34bea7b506f709d37984e90cc
+fs.img:
+  hash: bd280a499a46d43dade55de78fc5d87f65c3750c851e95aed448066564a3230a
+  verity-hash: 85758440ccc506cd0e73f541443fdf76eae34600dfd04c6d440b50a598fec57f
+  verity-offset: 397312
+---
+key: northstar
+signature: xK0f6gIqaarM8FTbhT/qnhSy4ROK8MsoluA2A6kpDCJaAvoea/41j3tY0c047OUL5f/wmnvqrHGyVQ5rr5rKDw==
+
+
+## SquashFS listing
+Parallel unsquashfs: Using 32 processors
+1 inodes (11 blocks) to write
+
+drwxr-xr-x user/user                89 2021-03-01 10:15 squashfs-root
+dr--r--r-- user/user                 3 2021-03-01 10:15 squashfs-root/dev
+-rwxr-xr-x user/user           1315816 2021-03-01 10:15 squashfs-root/hello
+dr-xr-xr-x user/user                 3 2021-03-01 10:15 squashfs-root/lib
+dr-xr-xr-x user/user                 3 2021-03-01 10:15 squashfs-root/lib64
+dr--r--r-- user/user                 3 2021-03-01 10:15 squashfs-root/proc
+dr-xr-xr-x user/user                 3 2021-03-01 10:15 squashfs-root/system
+</code></pre>
+<h2 id="inspecting-an-npk-with-the---short-parameter"><a class="header" href="#inspecting-an-npk-with-the---short-parameter">Inspecting an NPK with the <code>--short</code> parameter</a></h2>
+<p>To facilitate the inspection of many containers as part of scripts, the <code>inspect</code> command features the <code>--short</code> parameter.
+It condenses the inspection output into a single line with the following information:</p>
+<ul>
+<li>Container name</li>
+<li>Container version</li>
+<li>NPK format version</li>
+<li>Whether or not this is a <a href="sextant/npk_format_reference.html#ressource-containers">ressource container</a></li>
+</ul>
+<p>Inspecting the <code>hello</code> example container with the <code>--short</code> flag gives the following output:</p>
+<pre><code class="language-markdown">$ sextant inspect --short target/northstar/repository/hello-0.0.1.npk 
+`name: hello, version: 0.0.1, NPK version: 0.0.2, resource container: no`
+</code></pre>
+<h1 id="generating-repository-keys"><a class="header" href="#generating-repository-keys">Generating Repository Keys</a></h1>
+<p>To sign NPKs using <code>sextant</code> we first have to have a suitable key pair.
+This can be generated using the <code>sextant gen-key</code> command.
+The following call creates a new key pair called <code>repokey</code> in the current directory:</p>
+<pre><code class="language-bash">target/debug/sextant gen-key --name repokey --out .
+</code></pre>
+<p>After the call we can see that two files were created:</p>
+<pre><code class="language-bash">$ ls | grep repokey
+repokey.key
+repokey.pub
+</code></pre>
+<p>The private key <code>repokey.key</code> can be used for signing of NPKs (see <a href="sextant/pack.html">Packing an NPK</a>).
+The public key <code>repokey.pub</code> can be used by the northstar runtime to verify NPKs.</p>
+<h1 id="npk-format-reference"><a class="header" href="#npk-format-reference">NPK Format Reference</a></h1>
+<p>NPKs are compressed archives containing both the container's application logic as well as the data files necessary to mount an run the container.</p>
+<p>Internally, an NPK consist of three files:</p>
+<ul>
+<li>manifest.yaml</li>
+<li>signature.yaml</li>
+<li>fs.img</li>
+</ul>
+<h2 id="manifestyaml"><a class="header" href="#manifestyaml">Manifest.yaml</a></h2>
+<p>The file <code>manifest.yaml</code> references all data necessary to mount and execute the container.
+As an example, the <code>manifest.yaml</code> of the <code>memeater</code> example container looks as follows:</p>
+<pre><code class="language-yaml">name: memeater
+version: 0.0.1
+init: /memeater
+uid: 1000
+gid: 1000
+mounts:
+    /lib:
+      host: /lib
+    /lib64:
+      host: /lib64
+    /system:
+      host: /system
+cgroups:
+  memory:
+    limit_in_bytes: 10000000
+    swappiness: 0
+io:
+  stdout:
+    log:
+      - DEBUG
+      - memeater
+</code></pre>
+<h3 id="name"><a class="header" href="#name"><code>name</code></a></h3>
+<p>The name of the container
+Example:</p>
+<pre><code class="language-yaml">name: hello
+</code></pre>
+<h3 id="version"><a class="header" href="#version"><code>version</code></a></h3>
+<p>The version of the container
+Example:</p>
+<pre><code class="language-yaml">version: 0.0.1
+</code></pre>
+<h3 id="init"><a class="header" href="#init"><code>init</code></a></h3>
+<p>The binary executed when the container is run
+Example:</p>
+<pre><code class="language-yaml">init: /hello
+</code></pre>
+<h3 id="args-optional"><a class="header" href="#args-optional"><code>args</code> (optional)</a></h3>
+<p>Additional arguments for the application invocation
+Example:</p>
+<pre><code class="language-yaml">args:
+  - /message/hello
+</code></pre>
+<h3 id="uid"><a class="header" href="#uid"><code>uid</code></a></h3>
+<p>The user ID used to mount the container
+Example:</p>
+<pre><code class="language-yaml">uid: 1000
+</code></pre>
+<h3 id="gid"><a class="header" href="#gid"><code>gid</code></a></h3>
+<p>The group ID used to mount the container
+Example:</p>
+<pre><code class="language-yaml">gid: 1000
+</code></pre>
+<h3 id="env"><a class="header" href="#env"><code>env</code></a></h3>
+<p>List of additional environment variables and their values
+Example:</p>
+<pre><code class="language-yaml">env:
+  RUST_BACKTRACE: 1
+</code></pre>
+<h3 id="autostart"><a class="header" href="#autostart"><code>autostart</code></a></h3>
+<p>Whether or not this container should be run upon northstar startup
+Example:</p>
+<pre><code class="language-yaml">autostart: true
+</code></pre>
+<h3 id="cgroups"><a class="header" href="#cgroups"><code>cgroups</code></a></h3>
+<p>CGroup configuration
+Examples:</p>
+<pre><code class="language-yaml">cgroups:
+  cpu:
+    shares: 100
+</code></pre>
+<pre><code class="language-yaml">cgroups:
+  memory:
+    limit_in_bytes: 10000000
+    swappiness: 0
+</code></pre>
+<h3 id="seccomp-optional"><a class="header" href="#seccomp-optional"><code>seccomp</code> (optional)</a></h3>
+<p>SecComp configuration
+Example:</p>
+<p>Example:</p>
+<pre><code class="language-yaml">seccomp:
+  clone: 1
+  mmap: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+  prctl: 1
+  munmap: 1
+  mprotect: arg2 in ~PROT_EXEC || arg2 in ~PROT_WRITE
+  futex: 1
+  openat: 1
+  close: 1
+  execve: 1
+</code></pre>
+<h3 id="mounts"><a class="header" href="#mounts"><code>mounts</code></a></h3>
+<p>List of bind mounts and resources
+Example:</p>
+<pre><code class="language-yaml">mounts:
+    /lib:
+      host: /lib
+    /lib64:
+      host: /lib64
+    /system:
+      host: /system
+</code></pre>
+<h3 id="capabilities-optional"><a class="header" href="#capabilities-optional"><code>capabilities</code> (optional)</a></h3>
+<p>String containing capability names to give to new container
+Example:</p>
+<pre><code class="language-yaml">capabilities:
+  - cap_net_raw
+</code></pre>
+<h3 id="suppl_groups-optional"><a class="header" href="#suppl_groups-optional"><code>suppl_groups</code> (optional)</a></h3>
+<p>String containing group names to give to new container
+Example:</p>
+<pre><code class="language-yaml">suppl_groups:
+  - inet
+</code></pre>
+<h3 id="io-optional"><a class="header" href="#io-optional"><code>io</code> (optional)</a></h3>
+<p>Input/Output configuration
+Example:</p>
+<pre><code class="language-yaml">io:
+  stdout:
+    log:
+      - DEBUG
+      - hello
+</code></pre>
+<h2 id="signatureyaml"><a class="header" href="#signatureyaml">Signature.yaml</a></h2>
+<p>The file <code>signature.yaml</code> contains the hash of <code>manifest.yaml</code> and both hash and dm-verity information of the squashfs image <code>fs.img</code>.
+If the NPK is signed, a second entry in <code>signature.yaml</code> references the name of the key used to sign the NPK as well as the base64 encoded signature of the verity hash.</p>
+<p>An example <code>signature.yaml</code> looks as follows:</p>
+<pre><code class="language-yaml">manifest.yaml:
+  hash: ee5967e740febb3a1e018e189ed21412f8bf71d34bea7b506f709d37984e90cc
+fs.img:
+  hash: 35d1a25870a2bf25328a250243972b931e220057cc2d0fe998aef163ea59142e
+  verity-hash: f14909e6b8e6ca919f9086d54089feed49053f1e590a6f2dccad171960686eff
+  verity-offset: 397312
+---
+key: northstar
+signature: aDnKZ8JQ5tegOqKM2TW/ULU2DAlcVG7ieyS0ZaDGnRHT5Yggcgog5QbD0ZnTyGIFY8bo0+lToQu+BcK2XA35BA==
+</code></pre>
+<h2 id="ressource-containers"><a class="header" href="#ressource-containers">Ressource Containers</a></h2>
+<p>Containers without an <code>init</code> field in their <code>manifest.yaml</code> are called <strong>Ressource Containers</strong>.
+They are useful to provide common data to other containers.
+To add a reference to a resources container, we have to add an entry in the <code>mount</code> field of manifest of the referencing container.</p>
+<p>For example, the <code>ferris_says_hello</code> container references the <code>hello_message</code> container which provides a required string:</p>
+<pre><code class="language-yaml">mounts:
+  /bin:
+    resource: &quot;ferris:0.0.1/&quot;
+  /lib64:
+    host: /lib64
+  /lib:
+    host: /lib
+  /system:
+    host: /system
+  /message:
+    resource: &quot;hello_message:0.0.1/&quot;
 </code></pre>
 
                     </main>

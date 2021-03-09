@@ -173,25 +173,7 @@ The command requires the following input:</p>
 <h2 id="the-manifest-file"><a class="header" href="#the-manifest-file">The Manifest File</a></h2>
 <p>The manifest is a YAML file that references all necessary data to mount and execute the container.
 An example <code>manifest.yaml</code> of the <code>hello</code> container (found in <code>examples/container/hello/manifest.yaml</code>) looks as follows:</p>
-<pre><code class="language-yaml">name: hello
-version: 0.0.1
-init: /hello
-uid: 1000
-gid: 1000
-env:
-  HELLO: northstar
-io:
-  stdout:
-    log:
-      - DEBUG
-      - hello
-mounts:
-    /lib:
-      host: /lib
-    /lib64:
-      host: /lib64
-    /system:
-      host: /system
+<pre><code class="language-yaml">{{#include ./../../../examples/container/hello/manifest.yaml}}
 </code></pre>
 <p>More details on the manifest format can be found in the chapter
 <a href="npk_format_reference.html">NPK Format Reference</a>.</p>

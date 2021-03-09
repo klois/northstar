@@ -182,25 +182,7 @@ manifest.yaml
 fs.img
 
 ## manifest.yaml
-name: hello
-version: 0.0.1
-init: /hello
-uid: 1000
-gid: 1000
-env:
-  HELLO: northstar
-io:
-  stdout:
-    log:
-      - DEBUG
-      - hello
-mounts:
-    /lib:
-      host: /lib
-    /lib64:
-      host: /lib64
-    /system:
-      host: /system
+{{#include ./../../../examples/container/hello/manifest.yaml}}
 
 
 ## signature.yaml

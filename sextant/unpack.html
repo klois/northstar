@@ -166,24 +166,24 @@
                         <h1 id="unpacking-an-npk"><a class="header" href="#unpacking-an-npk">Unpacking an NPK</a></h1>
 <p>NPKs are ZIP files that contain among other things a squashfs image that will be mounted at runtime.
 To extract both the outer ZIP and the inner image, the <code>unpack</code> command of <code>sextant</code> can be used.</p>
-<p>To unpack the <code>hello</code> container we packed in the chapter <a href="pack.html">Packing an NPK</a> we first create an output directory for the extracted contents:</p>
-<pre><code class="language-bash">$ mkdir hello_container
+<p>To unpack the <code>hello-world</code> container we packed in the chapter <a href="pack.html">Packing an NPK</a> we first create an output directory for the extracted contents:</p>
+<pre><code class="language-bash">$ mkdir hello-world-container
 </code></pre>
 <p>Next, we call <code>sextant unpack</code>:</p>
 <pre><code class="language-bash">$ target/debug/sextant unpack \
---npk ./target/northstar/repository/hello-0.0.1.npk \
---out ./hello_container
+--npk ./target/northstar/repository/hello-world-0.0.1.npk \
+--out ./hello-world-container
 </code></pre>
 <p>The extracted container can be found in the directroy we created:</p>
-<pre><code class="language-bash">$ ls hello_container
+<pre><code class="language-bash">$ ls hello-world-container
 fs.img  manifest.yaml  signature.yaml  squashfs-root
 </code></pre>
 <p>As we can see, a <code>squashfs-root</code> directory was created.
 It contains the extracted contents of the <code>fs.img</code> squashfs image:</p>
-<pre><code class="language-bash">$ ls hello_container/squashfs-root/
-dev  hello  lib  lib64  proc  system
+<pre><code class="language-bash">$ ls hello-world-container/squashfs-root/
+dev  hello-world  lib  lib64  proc  system
 </code></pre>
-<p>We can see the <code>hello</code> binary as well as the empty mount points mentioned in the <code>manifest.yaml</code>.</p>
+<p>We can see the <code>hello-world</code> binary as well as the empty mount points mentioned in the <code>manifest.yaml</code>.</p>
 
                     </main>
 

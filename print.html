@@ -138,13 +138,15 @@
                         </a>
                         
                         
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -174,7 +176,7 @@ type that can be used for a simpler client implementation using <strong>Rust</st
 <p>For general purposes, the snippets shown in this tutorial are
 written in <strong>Python</strong> for its simplicity and easy translation to other
 languages.</p>
-<h1 id="interation-with-northstar"><a class="header" href="#interation-with-northstar">Interation with Northstar</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="interation-with-northstar"><a class="header" href="#interation-with-northstar">Interation with Northstar</a></h1>
 <p>Northstar interacts with clients through a <code>TCP</code> socket. The clients exchange
 messages with Northstar in the form of requests and responses encoded in
 <strong>JSON</strong>. These requests and responses are a direct serialization of the
@@ -199,7 +201,7 @@ tag a message exchange.</p>
 </code></pre>
 <p>The <code>MESSAGE_TYPE</code> can be either <code>&quot;Request&quot;</code>, <code>&quot;Response&quot;</code>, or <code>&quot;Notification&quot;</code>.
 Northstar should only send responses and notifications to clients.</p>
-<h1 id="northstar-repositories"><a class="header" href="#northstar-repositories">Northstar Repositories</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="northstar-repositories"><a class="header" href="#northstar-repositories">Northstar Repositories</a></h1>
 <p>Repositories are used to group sets of containers. These are specified in
 the Northstar configuration (see <code>northstar.toml</code>).</p>
 <p>Containers can be added or removed from repositories at runtime by
@@ -255,14 +257,14 @@ response = json.loads(response.decode('utf-8'))
 # e.g. {'Response': {'Repositories': {'default': {'dir': 'target/northstar/repository'}}}}
 print(response['payload'])
 </code></pre>
-<h1 id="containers"><a class="header" href="#containers">Containers</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="containers"><a class="header" href="#containers">Containers</a></h1>
 <ul>
 <li><a href="client/list_containers.html">List containers</a></li>
 <li><a href="client/start_containers.html">Starting containers and notifications</a></li>
 <li><a href="client/stop_containers.html">Stopping containers</a></li>
 <li><a href="client/install_containers.html">Installing and uninstalling containers</a></li>
 </ul>
-<h1 id="listing-containers"><a class="header" href="#listing-containers">Listing containers</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="listing-containers"><a class="header" href="#listing-containers">Listing containers</a></h1>
 <p>In the same way as <a href="client/repositories.html">repositories</a>, it is possible to request
 the current state of the Northstar containers. Here is the <code>JSON</code> structure that
 encodes the request for the state of the containers:</p>
@@ -315,7 +317,7 @@ for container in response['payload']['Response']['Containers']:
 # e.g. containers: ['cpueater', 'ferris_says_hello', 'seccomp', 'memeater', ...
 print(f'containers: {names}')
 </code></pre>
-<h1 id="starting-containers-and-notifications"><a class="header" href="#starting-containers-and-notifications">Starting containers and notifications</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="starting-containers-and-notifications"><a class="header" href="#starting-containers-and-notifications">Starting containers and notifications</a></h1>
 <p>Northstar has a notification system where messages are sent to the clients with
 information about events such as:</p>
 <ul>
@@ -372,7 +374,7 @@ print(json.loads(response.decode('utf-8')))
 response = s.recv(8000)
 print(json.loads(response.decode('utf-8')))
 </code></pre>
-<h1 id="stopping-containers"><a class="header" href="#stopping-containers">Stopping containers</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="stopping-containers"><a class="header" href="#stopping-containers">Stopping containers</a></h1>
 <p>Analogous to <a href="client/start_containers.html">starting containers</a>, this is the <code>JSON</code>
 structure to stop a container:</p>
 <pre><code class="language-json">{
@@ -434,7 +436,7 @@ print(json.loads(response.decode('utf-8')))
 response = s.recv(8000)
 print(json.loads(response.decode('utf-8')))
 </code></pre>
-<h1 id="installing-and-uninstalling-containers"><a class="header" href="#installing-and-uninstalling-containers">Installing and uninstalling containers</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="installing-and-uninstalling-containers"><a class="header" href="#installing-and-uninstalling-containers">Installing and uninstalling containers</a></h1>
 <p>Installing containers is a bit trickier. First a request to install a new
 container is sent with the target repository and the size of the container <code>npk</code>
 file in bytes. Then the file is directly copied into the socket. If successful,
@@ -550,7 +552,7 @@ print(json.loads(response.decode('utf-8')))
 response = s.recv(8000)
 print(json.loads(response.decode('utf-8')))
 </code></pre>
-<h1 id="working-with-npk-files"><a class="header" href="#working-with-npk-files">Working with NPK files</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="working-with-npk-files"><a class="header" href="#working-with-npk-files">Working with NPK files</a></h1>
 <p>Northstar containers are distributed in the NPK file format.</p>
 <p>NPKs contain both the container's application logic as well as the data files necessary to mount an run the container.
 To facilitate the creation, inspection and modification of NPKs, northstar provides the <code>sextant</code> CLI tool.</p>
@@ -562,7 +564,7 @@ To facilitate the creation, inspection and modification of NPKs, northstar provi
 <li><a href="sextant/gen_repo_keys.html">Generating Repository Keys</a></li>
 <li><a href="sextant/npk_format_reference.html">NPK Format Reference</a></li>
 </ul>
-<h1 id="packing-an-npk"><a class="header" href="#packing-an-npk">Packing an NPK</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="packing-an-npk"><a class="header" href="#packing-an-npk">Packing an NPK</a></h1>
 <p>NPKs are created using the <code>pack</code> command of <code>sextant</code>.
 The command requires the following input:</p>
 <ol>
@@ -636,7 +638,7 @@ To create a signed version of our container we have to specify the required priv
 --out target/northstar/repository
 </code></pre>
 <p>Chapter <a href="sextant/gen_repo_keys.html">Generating Repository Keys</a> describes how to generate keys suitable for signing and verifying NPKs.</p>
-<h1 id="unpacking-an-npk"><a class="header" href="#unpacking-an-npk">Unpacking an NPK</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="unpacking-an-npk"><a class="header" href="#unpacking-an-npk">Unpacking an NPK</a></h1>
 <p>NPKs are ZIP files that contain among other things a squashfs image that will be mounted at runtime.
 To extract both the outer ZIP and the inner image, the <code>unpack</code> command of <code>sextant</code> can be used.</p>
 <p>To unpack the <code>hello-world</code> container we packed in the chapter <a href="sextant/pack.html">Packing an NPK</a> we first create an output directory for the extracted contents:</p>
@@ -657,7 +659,7 @@ It contains the extracted contents of the <code>fs.img</code> squashfs image:</p
 dev  hello-world  lib  lib64  proc  system
 </code></pre>
 <p>We can see the <code>hello-world</code> binary as well as the empty mount points mentioned in the <code>manifest.yaml</code>.</p>
-<h1 id="inspecting-an-npk"><a class="header" href="#inspecting-an-npk">Inspecting an NPK</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="inspecting-an-npk"><a class="header" href="#inspecting-an-npk">Inspecting an NPK</a></h1>
 <p>To get information about an already packed NPK <code>sextant</code> provides the <code>inspect</code> command.</p>
 <h2 id="inspecting-an-npk-with-default-settings"><a class="header" href="#inspecting-an-npk-with-default-settings">Inspecting an NPK with Default Settings</a></h2>
 <p>Inspecting an NPK without any additional parameters will show the following information:</p>
@@ -732,7 +734,7 @@ It condenses the inspection output into a single line with the following informa
 <pre><code class="language-markdown">$ sextant inspect --short target/northstar/repository/hello-world-0.0.1.npk 
 `name: hello-world, version: 0.0.1, NPK version: 0.0.2, resource container: no`
 </code></pre>
-<h1 id="generating-repository-keys"><a class="header" href="#generating-repository-keys">Generating Repository Keys</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="generating-repository-keys"><a class="header" href="#generating-repository-keys">Generating Repository Keys</a></h1>
 <p>To sign NPKs using <code>sextant</code> we first have to have a suitable key pair.
 This can be generated using the <code>sextant gen-key</code> command.
 The following call creates a new key pair called <code>repokey</code> in the current directory:</p>
@@ -745,7 +747,7 @@ repokey.pub
 </code></pre>
 <p>The private key <code>repokey.key</code> can be used for signing of NPKs (see <a href="sextant/pack.html">Packing an NPK</a>).
 The public key <code>repokey.pub</code> can be used by the northstar runtime to verify NPKs.</p>
-<h1 id="npk-format-reference"><a class="header" href="#npk-format-reference">NPK Format Reference</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="npk-format-reference"><a class="header" href="#npk-format-reference">NPK Format Reference</a></h1>
 <p>NPKs are compressed archives containing both the container's application logic as well as the data files necessary to mount an run the container.</p>
 <p>Internally, an NPK consist of three files:</p>
 <ul>
